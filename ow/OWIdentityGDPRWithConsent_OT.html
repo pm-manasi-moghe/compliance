@@ -141,13 +141,13 @@ function OptanonWrapper() { }
 	  var wtads = document.createElement('script');
 	  wtads.async = true;
 	  wtads.type = 'text/javascript';
-	  if (profileId !== '0') {
+	  /*if (profileId !== '0') {
 		wtads.src = 'https://ads.pubmatic.com/AdServer/js/pwt/5890'+profileId+profileVersionId+'/pwt.js';
 	  } else {
 		wtads.src = 'owt.'+profile+"."+project+".js";
-	  }
+	  }*/
 	  
-	  //wtads.src = "pwt_premium.js"; 
+	  wtads.src = "owt.ow.compliance_nightly.js"; 
 	  
 	  var node = document.getElementsByTagName('script')[0];
 	  node.parentNode.insertBefore(wtads, node);
