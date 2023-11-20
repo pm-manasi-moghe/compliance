@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML> 
 
 <html lang="en-us">
@@ -9,6 +8,17 @@
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 <meta name="google-signin-client_id" content="751991855817-e5491un39teregj7ctasi8io9pooirdu.apps.googleusercontent.com">
 <title>NON SRA</title>
+
+<script src="https://cdn.cookielaw.org/consent/tcf.stub.js" type="text/javascript" charset="UTF-8"></script>
+
+ 
+<!-- OneTrust Cookies Consent Notice start for pm-nitin-nimbalkar.github.io -->
+<script type="text/javascript" src="https://cdn.cookielaw.org/consent/3b33fbdb-1108-4db2-bcef-7a28ba71acd3/OtAutoBlock.js" ></script>
+<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="3b33fbdb-1108-4db2-bcef-7a28ba71acd3" ></script>
+<script type="text/javascript">
+function OptanonWrapper() { }
+</script>
+<!-- OneTrust Cookies Consent Notice end for pm-nitin-nimbalkar.github.io -->
 
 <script>
     (function(d, s, id){
@@ -96,6 +106,8 @@
 	  var url = '//ads.pubmatic.com/AdServer/js/pwt/5890';
 	  var profileId = '0';
 	  var profileVersionId = '1';
+	  var profile = '';
+	  var project = '';
 	 
 	  if(purl.indexOf('profile=')>0){
 		var regexp = /profile=(.*?)(&|$)/g;
@@ -134,7 +146,7 @@
 		wtads.src = 'owt.'+profile+"."+project+".js";
 	  }
 	  
-	  //wtads.src = "pwt_premium.js"; 
+	  //wtads.src = "owt.ow.compliance_nightly.js"; 
 	  
 	  var node = document.getElementsByTagName('script')[0];
 	  node.parentNode.insertBefore(wtads, node);
