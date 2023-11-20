@@ -1,14 +1,14 @@
+
 <!DOCTYPE HTML> 
 
 <html lang="en-us">
 <head>
-
-
-
-
-<meta http-equiv="Content-type" content="text/html; charset=utf-8"> 
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId=108266609198912&autoLogAppEvents=1" nonce="NPNzjk3X"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="751991855817-e5491un39teregj7ctasi8io9pooirdu.apps.googleusercontent.com">
 <title>NON SRA</title>
-
 
 <script src="https://cdn.cookielaw.org/consent/tcf.stub.js" type="text/javascript" charset="UTF-8"></script>
 
@@ -21,88 +21,164 @@ function OptanonWrapper() { }
 </script>
 <!-- OneTrust Cookies Consent Notice end for pm-nitin-nimbalkar.github.io -->
 
-		<!-- Loading Asynchronously -->
-<script type="text/javascript">
-Array.$constructor = function() {
-    for (i = 0; i < this.length; i++) {
-        this[i] = this[i].toUpperCase();
-    }
-};
-</script>
-
-		<script type="text/javascript">
-	(function() {
-    window.PWT = window.PWT || {
+<script>
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+  
+	 window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '2984036861834746',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v12.0',
+        status     : true
+      });
     };
-    if (window.PWT && !window.PWT.HookForPrebidSetConfig) {
-        window.PWT.HookForPrebidSetConfig = function() {
-            owpbjs && owpbjs.setUserIdentities({
-                pubProvidedEmailHash: {
-                    'SHA256': 'fcbb332d8e34a015947614fcf92ff06c92323d9fe78ffbb67f48fdfd13ac1dde'
-                }
-            });
-        }
-    }
-}
-)();
+</script>
+
+<script type="text/javascript">
+	window.PWT=window.PWT || {};
+	//window.PWT.OVERRIDES_PRIMARY_MODULES = [];
+	//window.PWT.OVERRIDES_SCRIPT_BASED_MODULES = ["identityLink"];
+  </script>
+  <script type="text/javascript">
+  (function(){
+	window.PWT=window.PWT || {};
+	if(window.PWT&&!window.PWT.HookForPrebidSetConfig){
+	  window.PWT.HookForPrebidSetConfig=function(configs){
+		window.PWT.loginEvent = true;
+		owpbjs&&owpbjs.setUserIdentities({
+		  pubProvidedEmailHash: {
+			'SHA256': 'fcbb332d8e34a015947614fcf92ff06c92323d9fe78ffbb67f48fdfd13ac1dde'
+		  }
+		});
+		console.log("#### in HookForPrebidSetConfig ", owpbjs.getUserIdsAsEids ? owpbjs.getUserIdsAsEids() : []);
+		console.log("#### in HookForPrebidSetConfig existing configs - ", configs.userSync);
+		
+		configs.userSync.userIds.push(
+		{ 
+			name: "pubProvidedId", 
+			params: { 
+				eids: [{
+					source: "domain.com",
+					uids: [{
+						id: "value read from cookie or local storage",
+						atype: 1,
+						ext: {
+							stype: "ppuid"
+						}
+
+					}]
+				}, {
+					source: "3rdpartyprovided.com",
+					uids: [{
+						id: "value read from cookie or local storage",
+						atype: 3,
+						ext: {
+							stype: "dmp"
+						}
+					}]
+				}]
+			} 
+		})
+		//owpbjs.refreshUserIds({submoduleNames: ["pubProvidedId"]}, undefined, true);
+	  }
+	}
+  })();
+  </script>
+<script>
+	var owpbjs = owpbjs || {};
+	owpbjs.que = owpbjs.que || [];
+	console.log("#### Logging ids before adding pubprovided id ", owpbjs.getUserIdsAsEids ? owpbjs.getUserIdsAsEids() : []);
+
+
 
 </script>
 <script type="text/javascript">
-(function() {
-	var purl = window.location.href;
-	var url = '//ads.pubmatic.com/AdServer/js/pwt/5890';
-	var profileId = '';
-	var profileVersionId = '';
-	if(purl.indexOf('profileid=')>0){
-		var regexp = /profileid=(.*?)(&|$)/g;
+	(function() {
+		
+
+	  var purl = window.location.href;
+	  var url = '//ads.pubmatic.com/AdServer/js/pwt/5890';
+	  var profileId = '0';
+	  var profileVersionId = '1';
+	 
+	  if(purl.indexOf('profile=')>0){
+		var regexp = /profile=(.*?)(&|$)/g;
+		var matches = regexp.exec(purl);
+		if(matches.length >= 2 && matches[1].length > 0){
+		  profile = matches[1];
+		}
+	  }
+	  if(purl.indexOf('pwtv=')>0){
+		var regexp = /pwtv=(.*?)(&|$)/g;
+		var matches = regexp.exec(purl);
+		if(matches.length >= 2 && matches[1].length > 0){
+		  profileVersionId = '/'+matches[1];
+		}
+	  }
+	  if(purl.indexOf('project=')>0){
+		var regexp = /project=(.*?)(&|$)/g;
+		var matches = regexp.exec(purl);
+		if(matches.length >= 2 && matches[1].length > 0){
+		  project = matches[1];
+		}
+	  }
+	  if(purl.indexOf('profileId=')>0) {
+		var regexp = /profileId=(.*?)(&|$)/g;
 		var matches = regexp.exec(purl);
 		if(matches.length >= 2 && matches[1].length > 0){
 			profileId = '/'+matches[1];
 		}
-	}
-	if(purl.indexOf('pwtv=')>0){
-		var regexp = /pwtv=(.*?)(&|$)/g;
-		var matches = regexp.exec(purl);
-		if(matches.length >= 2 && matches[1].length > 0){
-			profileVersionId = '/'+matches[1];
-		}
-	}
-	var wtads = document.createElement('script');
-	wtads.async = true;
-	wtads.type = 'text/javascript';
-	//wtads.src = 'https://ads.pubmatic.com/AdServer/js/pwt/5890/10240/1/pwt.js';
-	wtads.src = "owt.ow.actctrl1.js";
-	var node = document.getElementsByTagName('script')[0];
-	node.parentNode.insertBefore(wtads, node);
-})();
-</script>
-		
+	  }
+	  var wtads = document.createElement('script');
+	  wtads.async = true;
+	  wtads.type = 'text/javascript';
+	  if (profileId !== '0') {
+		wtads.src = 'https://ads.pubmatic.com/AdServer/js/pwt/5890'+profileId+profileVersionId+'/pwt.js';
+	  } else {
+		wtads.src = 'owt.'+profile+"."+project+".js";
+	  }
+	  
+	  //wtads.src = "pwt_premium.js"; 
+	  
+	  var node = document.getElementsByTagName('script')[0];
+	  node.parentNode.insertBefore(wtads, node);
+	})();
+	
+	</script>
+	
 		<script type='text/javascript'>	
 			var googletag = googletag || {};
 			googletag.cmd = googletag.cmd || [];
+			
 			(function() {
 				setTimeout(function(){
 					var gads = document.createElement('script');
 					gads.async = true;
 					gads.type = 'text/javascript';
 					var useSSL = 'https:' == document.location.protocol;
-					gads.src = (useSSL ? 'https:' : 'https:') +
-					'//securepubads.g.doubleclick.net/tag/js/gpt.js';
+					gads.src = (useSSL ? 'https:' : 'http:') +
+					'//www.googletagservices.com/tag/js/gpt.js';
 					var node = document.getElementsByTagName('script')[0];
 					node.parentNode.insertBefore(gads, node);
-			}, 250); // Adding 250ms delay to gpt.js for PubMatic script to load
+			}, 6000); // Adding 250ms delay to gpt.js for PubMatic script to load
 		})();
 		</script>
 
 		<script type="text/javascript">
 			googletag.cmd.push(function() {
-				var s1=googletag.defineSlot('/43743431/DMDemo', [728, 90], 'Div1').addService(googletag.pubads());
+				var s1=googletag.defineSlot('/43743431/DMDemo', [[728, 90]], 'Div1').addService(googletag.pubads());
 				s1.setTargeting('a', [1]);
 				s1.setTargeting('b', [2]);
 				s1.setTargeting('c', 3);
 				s1.setTargeting('d', ['a', 'b', 'c']);				
 				
-
 				var s2=googletag.defineSlot('/43743431/DMDemo1', [[300, 250]], 'Div2').addService(googletag.pubads());
 				s2.setTargeting('aa', [11]);
 				s2.setTargeting('bb', [22]);
@@ -167,6 +243,19 @@ Array.$constructor = function() {
 			  name="first"
 			/>
 			<button type="submit">Submit</button>
-		
+
+			
+			<!-- <script type='text/javascript'>	
+				setTimeout(function(){
+					var gads = document.createElement('script');
+					gads.async = true;
+					gads.type = 'text/javascript';
+					var useSSL = 'https:' == document.location.protocol;
+					gads.src = 'complaince.js'
+					var scripts = document.getElementsByTagName('script').length;
+					var node = document.getElementsByTagName('script')[scripts-1]
+					node.parentNode.insertBefore(gads, node);
+				}, 6000); // Adding 250ms delay to gpt.js for PubMatic script to load
+			</script> -->
 	</body>
 </html>
