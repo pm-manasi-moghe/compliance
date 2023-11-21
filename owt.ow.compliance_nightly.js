@@ -14458,6 +14458,7 @@ var DEFAULT_PROFILE_ID = 0;
 var DEFAULT_PROFILE_VERSION_ID = 0;
 var DEFAULT_IDENTITY_ONLY = '0';
 var COMPLIANCE_INIT = 'CMP_Loaded';
+var loggerFired = false;
 
 //const IH_ANALYTICS_EXPIRY = 7;
 //const IH_LOGGER_STORAGE_KEY = 'IH_LGCL_TS'
@@ -14495,7 +14496,7 @@ function collectBasicConsentData(args) {
   outputObj['cmpEv'] = args.consentData.eventStatus; // cmp event code
   outputObj['cmpNm'] = args.cmp.name; // cmp name
   outputObj['cmpId'] = args.cmp.id; // cmp id
-  outputObj['tcS'] = args.consentData.tcString;
+  outputObj['dtcS'] = args.consentData.tcString; // default consent string
   outputObj['gdprA'] = args.consentData.gdprApplies; // whether gdpr applies or not
   outputObj['cc'] = args.consentData.publisherCC; // geo of publisher or site
   outputObj['im'] = (0,_src_prebidGlobal_js__WEBPACK_IMPORTED_MODULE_2__.getGlobal)().installedModules;
@@ -14517,8 +14518,8 @@ function collectUserConsentDataAndFireLogger(args) {
   }); //purpose consent values
   outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
     7: args.consentData.purpose.consents['7']
-  }); //purpose consent values
-
+  }); //purpose consent 
+  outputObj['tcS'] = args.consentData.tcString;
   outputObj['li'] = args.consentData.purpose.legitimateInterests; // legitimateInterests consent values
   //outputObj['vc'] = args.consentData.vendor.consents; // vendor consent values
   outputObj['vli'] = args.consentData.vendor.legitimateInterests; // vendor legitimateInterests consent values
@@ -14564,13 +14565,14 @@ function populateDummyData() {
     outputObj['pv'] = "v6.18.0";
   }
 }
-function fireComplianceLoggerCall(args) {
+function fireComplianceLoggerCall() {
   console.log("Compliance logger call - fireComplianceLoggerCall");
   window.complianceData = outputObj;
   populateDummyData();
   //outputObj['bb'] = args.biddersBlocked; //list of blocked bidders
   //outputObj['ipb'] = args.storageBlocked; //list of id modules blocked
   (0,_src_complianceUtils_js__WEBPACK_IMPORTED_MODULE_4__.validateConsentData)(outputObj);
+  loggerFired = true;
   (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(pixelURL, null, JSON.stringify(outputObj), {
     contentType: 'application/json',
     withCredentials: true,
@@ -14626,17 +14628,21 @@ var complianceAdapter = Object.assign({}, baseAdapter, {
       case COMPLIANCE_INIT:
         (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)('Compliance Logger fired - ' + COMPLIANCE_INIT);
         (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)(args);
-        if (args.consentData.eventStatus === "tcloaded" || args.consentData.eventStatus === "cmpuishown") {
-          collectBasicConsentData(args);
-          setTimeout(function () {
+        switch (args.consentData.eventStatus) {
+          case 'tcloaded':
+          case 'cmpuishown':
+            collectBasicConsentData(args);
+            break;
+          case 'useractioncomplete':
             collectUserConsentDataAndFireLogger(args);
-          }, 2000);
-        }
-        if (args.consentData.eventStatus === "useractioncomplete") {
-          collectUserConsentDataAndFireLogger(args);
+            break;
         }
         break;
     }
+    setTimeout(function () {
+      (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)("Compliance logger did not fire with cmp values. CMP not loaded, or user action not detected. Firing logger with defqault values");
+      fireComplianceLoggerCall();
+    }, 10000);
   }
 });
 
