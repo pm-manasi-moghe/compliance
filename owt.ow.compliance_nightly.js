@@ -14626,7 +14626,7 @@ var complianceAdapter = Object.assign({}, baseAdapter, {
       args = _ref.args;
     switch (eventType) {
       case COMPLIANCE_INIT:
-        (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)('Compliance Logger fired - ' + COMPLIANCE_INIT);
+        (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)(LOG_PRE_FIX + 'Logger fired - ' + COMPLIANCE_INIT);
         (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)(args);
         switch (args.consentData.eventStatus) {
           case 'tcloaded':
@@ -14637,14 +14637,14 @@ var complianceAdapter = Object.assign({}, baseAdapter, {
             collectUserConsentDataAndFireLogger(args);
             break;
         }
+        setTimeout(function () {
+          (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)(LOG_PRE_FIX + "Logger did not fire with cmp values. CMP not loaded, or user action not detected. Firing logger with defqault values");
+          if (!loggerFired) {
+            fireComplianceLoggerCall();
+          }
+        }, 10000);
         break;
     }
-    setTimeout(function () {
-      (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)("Compliance logger did not fire with cmp values. CMP not loaded, or user action not detected. Firing logger with defqault values");
-      if (!loggerFired) {
-        fireComplianceLoggerCall();
-      }
-    }, 10000);
   }
 });
 
