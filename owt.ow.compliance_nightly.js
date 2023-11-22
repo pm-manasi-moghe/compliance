@@ -14597,7 +14597,7 @@ function fireComplianceLoggerCall(tcs) {
     loggerFired = true;
     (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(pixelURL, {
       success: setCookie,
-      error: null
+      error: setCookie
     }, JSON.stringify(outputObj), {
       contentType: 'application/json',
       withCredentials: true,
