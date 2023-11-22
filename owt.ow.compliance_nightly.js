@@ -14586,8 +14586,8 @@ function populateDummyData() {
     outputObj['pv'] = "v6.18.0";
   }
 }
-function fireComplianceLoggerCall() {
-  if (shouldFireLogger(args.consentData.tcString)) {
+function fireComplianceLoggerCall(tcs) {
+  if (shouldFireLogger(tcs)) {
     console.log("Compliance logger call - fireComplianceLoggerCall");
     window.complianceData = outputObj;
     //populateDummyData();
@@ -14666,7 +14666,7 @@ var complianceAdapter = Object.assign({}, baseAdapter, {
         setTimeout(function () {
           (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.logInfo)(LOG_PRE_FIX + "Logger did not fire with cmp values. CMP not loaded, or user action not detected. Firing logger with defqault values");
           if (!loggerFired) {
-            fireComplianceLoggerCall();
+            fireComplianceLoggerCall(args.consentData.tcString);
           }
         }, 20000);
         break;
