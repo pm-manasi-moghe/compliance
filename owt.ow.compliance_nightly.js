@@ -14526,55 +14526,53 @@ function shouldFireLogger(tcs) {
 }
 function collectUserConsentDataAndFireLogger(args) {
   console.log("Compliance logger call - collectUserConsentDataAndFireLogger");
-  if (shouldFireLogger(args.consentData.tcString)) {
-    var URL = "https://ut.pubmatic.com/geo?pubid=" + publisherId;
-    outputObj['vc'] = {};
-    (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__._each)(_src_complianceUtils_js__WEBPACK_IMPORTED_MODULE_4__.configurationMap, function (obj, key) {
-      outputObj['vc'] = _objectSpread(_objectSpread({}, outputObj['vc']), {}, (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, obj.gvlid, args.consentData.vendor.consents[obj.gvlid]));
-    });
-    outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
-      1: args.consentData.purpose.consents['1']
-    }); //purpose consent values
-    outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
-      2: args.consentData.purpose.consents['2']
-    }); //purpose consent values
-    outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
-      7: args.consentData.purpose.consents['7']
-    }); //purpose consent 
-    outputObj['tcS'] = args.consentData.tcString;
-    outputObj['li'] = args.consentData.purpose.legitimateInterests; // legitimateInterests consent values
-    //outputObj['vc'] = args.consentData.vendor.consents; // vendor consent values
-    outputObj['vli'] = args.consentData.vendor.legitimateInterests; // vendor legitimateInterests consent values
+  var URL = "https://ut.pubmatic.com/geo?pubid=" + publisherId;
+  outputObj['vc'] = {};
+  (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__._each)(_src_complianceUtils_js__WEBPACK_IMPORTED_MODULE_4__.configurationMap, function (obj, key) {
+    outputObj['vc'] = _objectSpread(_objectSpread({}, outputObj['vc']), {}, (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, obj.gvlid, args.consentData.vendor.consents[obj.gvlid]));
+  });
+  outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
+    1: args.consentData.purpose.consents['1']
+  }); //purpose consent values
+  outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
+    2: args.consentData.purpose.consents['2']
+  }); //purpose consent values
+  outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
+    7: args.consentData.purpose.consents['7']
+  }); //purpose consent 
+  outputObj['tcS'] = args.consentData.tcString;
+  outputObj['li'] = args.consentData.purpose.legitimateInterests; // legitimateInterests consent values
+  //outputObj['vc'] = args.consentData.vendor.consents; // vendor consent values
+  outputObj['vli'] = args.consentData.vendor.legitimateInterests; // vendor legitimateInterests consent values
 
-    getRegion = function getRegion(resp) {
-      try {
-        var location = JSON.parse(resp);
-        outputObj['loc'] = location.cc || location.error;
-        fireComplianceLoggerCall(args);
-      } catch (e) {
-        console.log("Location data is expected to be an object");
-        fireComplianceLoggerCall({
-          error: e
-        });
-      }
-    };
+  getRegion = function getRegion(resp) {
     try {
-      (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(URL, {
-        success: getRegion,
-        error: function error(e) {
-          getRegion({
-            error: e
-          });
-        }
-      }, null, {
-        contentType: 'application/x-www-form-urlencoded',
-        method: 'GET'
-      });
+      var location = JSON.parse(resp);
+      outputObj['loc'] = location.cc || location.error;
+      fireComplianceLoggerCall(args);
     } catch (e) {
-      getRegion({
+      console.log("Location data is expected to be an object");
+      fireComplianceLoggerCall({
         error: e
       });
     }
+  };
+  try {
+    (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(URL, {
+      success: getRegion,
+      error: function error(e) {
+        getRegion({
+          error: e
+        });
+      }
+    }, null, {
+      contentType: 'application/x-www-form-urlencoded',
+      method: 'GET'
+    });
+  } catch (e) {
+    getRegion({
+      error: e
+    });
   }
 }
 function populateDummyData() {
@@ -14589,21 +14587,23 @@ function populateDummyData() {
   }
 }
 function fireComplianceLoggerCall() {
-  console.log("Compliance logger call - fireComplianceLoggerCall");
-  window.complianceData = outputObj;
-  //populateDummyData();
-  //outputObj['bb'] = args.biddersBlocked; //list of blocked bidders
-  //outputObj['ipb'] = args.storageBlocked; //list of id modules blocked
-  //validateConsentData(outputObj);
-  loggerFired = true;
-  (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(pixelURL, {
-    success: setCookie,
-    error: null
-  }, JSON.stringify(outputObj), {
-    contentType: 'application/json',
-    withCredentials: true,
-    method: 'POST'
-  });
+  if (shouldFireLogger(args.consentData.tcString)) {
+    console.log("Compliance logger call - fireComplianceLoggerCall");
+    window.complianceData = outputObj;
+    //populateDummyData();
+    //outputObj['bb'] = args.biddersBlocked; //list of blocked bidders
+    //outputObj['ipb'] = args.storageBlocked; //list of id modules blocked
+    //validateConsentData(outputObj);
+    loggerFired = true;
+    (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(pixelURL, {
+      success: setCookie,
+      error: null
+    }, JSON.stringify(outputObj), {
+      contentType: 'application/json',
+      withCredentials: true,
+      method: 'POST'
+    });
+  }
 }
 ;
 /// /////////// ADAPTER EVENT HANDLER FUNCTIONS //////////////
