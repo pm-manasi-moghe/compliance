@@ -14439,6 +14439,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 
 
+
 /* installed modules = 
 'complianceAnalyticsAdapter', 'consentManagement', 'gdprEnforcement', , 'userId'
 'criteoBidAdapter', 'pubmaticBidAdapter', 
@@ -14458,10 +14459,6 @@ var DEFAULT_PROFILE_ID = 0;
 var DEFAULT_PROFILE_VERSION_ID = 0;
 var DEFAULT_IDENTITY_ONLY = '0';
 var COMPLIANCE_INIT = 'CMP_Loaded';
-var loggerFired = false;
-
-//const IH_ANALYTICS_EXPIRY = 7;
-//const IH_LOGGER_STORAGE_KEY = 'IH_LGCL_TS'
 
 /// /////////// VARIABLES //////////////
 var publisherId = DEFAULT_PUBLISHER_ID; // int: mandatory
@@ -14473,6 +14470,10 @@ var cmpConfig = {};
 var outputObj = {};
 var pixelURL = END_POINT_HOST; //END_POINT_BID_LOGGER;
 window.complianceData = {};
+var loggerFired = false;
+var COMPLIANCE_LOGGER_COOKIE = 'csh';
+var COMPLIANCE_LOGGER_COOKIE_EXP = 'csh_exp';
+var COMPLIANCE_LOGGER_EXPIRY_VALUE = 1;
 var coreStorage = (0,_src_storageManager_js__WEBPACK_IMPORTED_MODULE_1__.getCoreStorageManager)('userid');
 
 /// /////////// HELPER FUNCTIONS //////////////
@@ -14503,55 +14504,77 @@ function collectBasicConsentData(args) {
   outputObj['ts'] = new Date().getTime(); //timstamp
 }
 ;
+function setCookie(tcs) {
+  if ((0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.hasDeviceAccess)()) {
+    coreStorage.setCookie(COMPLIANCE_LOGGER_COOKIE_EXP, new Date(Date.now() + COMPLIANCE_LOGGER_EXPIRY_VALUE * (60 * 60 * 24 * 1000)).toUTCString());
+    coreStorage.setCookie(COMPLIANCE_LOGGER_COOKIE, (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.cyrb53Hash)(tcs));
+  }
+}
+function shouldFireLogger(tcs) {
+  if (!(0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.hasDeviceAccess)()) {
+    //device access is denied, so there is not existing cookie. fire the logger call.
+    return true;
+  }
+  var ts = coreStorage.getCookie(COMPLIANCE_LOGGER_COOKIE_EXP); //if ts is undefined, there is no prev cookie, so fire the logger.
+  var today = new Date();
+  var prevConsentStr = coreStorage.getCookie(COMPLIANCE_LOGGER_COOKIE);
+  var newConsentStr = (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.cyrb53Hash)(tcs);
+  if (ts === undefined || ts !== undefined && new Date(ts) < today || newConsentStr !== prevConsentStr) {
+    return true;
+  }
+  return false;
+}
 function collectUserConsentDataAndFireLogger(args) {
   console.log("Compliance logger call - collectUserConsentDataAndFireLogger");
-  var URL = "https://ut.pubmatic.com/geo?pubid=" + publisherId;
-  outputObj['vc'] = {};
-  (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__._each)(_src_complianceUtils_js__WEBPACK_IMPORTED_MODULE_4__.configurationMap, function (obj, key) {
-    outputObj['vc'] = _objectSpread(_objectSpread({}, outputObj['vc']), {}, (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, obj.gvlid, args.consentData.vendor.consents[obj.gvlid]));
-  });
-  outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
-    1: args.consentData.purpose.consents['1']
-  }); //purpose consent values
-  outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
-    2: args.consentData.purpose.consents['2']
-  }); //purpose consent values
-  outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
-    7: args.consentData.purpose.consents['7']
-  }); //purpose consent 
-  outputObj['tcS'] = args.consentData.tcString;
-  outputObj['li'] = args.consentData.purpose.legitimateInterests; // legitimateInterests consent values
-  //outputObj['vc'] = args.consentData.vendor.consents; // vendor consent values
-  outputObj['vli'] = args.consentData.vendor.legitimateInterests; // vendor legitimateInterests consent values
+  if (shouldFireLogger(args.consentData.tcString)) {
+    var URL = "https://ut.pubmatic.com/geo?pubid=" + publisherId;
+    outputObj['vc'] = {};
+    (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__._each)(_src_complianceUtils_js__WEBPACK_IMPORTED_MODULE_4__.configurationMap, function (obj, key) {
+      outputObj['vc'] = _objectSpread(_objectSpread({}, outputObj['vc']), {}, (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])({}, obj.gvlid, args.consentData.vendor.consents[obj.gvlid]));
+    });
+    outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
+      1: args.consentData.purpose.consents['1']
+    }); //purpose consent values
+    outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
+      2: args.consentData.purpose.consents['2']
+    }); //purpose consent values
+    outputObj['pc'] = _objectSpread(_objectSpread({}, outputObj['pc']), {}, {
+      7: args.consentData.purpose.consents['7']
+    }); //purpose consent 
+    outputObj['tcS'] = args.consentData.tcString;
+    outputObj['li'] = args.consentData.purpose.legitimateInterests; // legitimateInterests consent values
+    //outputObj['vc'] = args.consentData.vendor.consents; // vendor consent values
+    outputObj['vli'] = args.consentData.vendor.legitimateInterests; // vendor legitimateInterests consent values
 
-  getRegion = function getRegion(resp) {
-    try {
-      var location = JSON.parse(resp);
-      outputObj['loc'] = location.cc || location.error;
-      fireComplianceLoggerCall(args);
-    } catch (e) {
-      console.log("Location data is expected to be an object");
-      fireComplianceLoggerCall({
-        error: e
-      });
-    }
-  };
-  try {
-    (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(URL, {
-      success: getRegion,
-      error: function error(e) {
-        getRegion({
+    getRegion = function getRegion(resp) {
+      try {
+        var location = JSON.parse(resp);
+        outputObj['loc'] = location.cc || location.error;
+        fireComplianceLoggerCall(args);
+      } catch (e) {
+        console.log("Location data is expected to be an object");
+        fireComplianceLoggerCall({
           error: e
         });
       }
-    }, null, {
-      contentType: 'application/x-www-form-urlencoded',
-      method: 'GET'
-    });
-  } catch (e) {
-    getRegion({
-      error: e
-    });
+    };
+    try {
+      (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(URL, {
+        success: getRegion,
+        error: function error(e) {
+          getRegion({
+            error: e
+          });
+        }
+      }, null, {
+        contentType: 'application/x-www-form-urlencoded',
+        method: 'GET'
+      });
+    } catch (e) {
+      getRegion({
+        error: e
+      });
+    }
   }
 }
 function populateDummyData() {
@@ -14568,12 +14591,15 @@ function populateDummyData() {
 function fireComplianceLoggerCall() {
   console.log("Compliance logger call - fireComplianceLoggerCall");
   window.complianceData = outputObj;
-  populateDummyData();
+  //populateDummyData();
   //outputObj['bb'] = args.biddersBlocked; //list of blocked bidders
   //outputObj['ipb'] = args.storageBlocked; //list of id modules blocked
-  (0,_src_complianceUtils_js__WEBPACK_IMPORTED_MODULE_4__.validateConsentData)(outputObj);
+  //validateConsentData(outputObj);
   loggerFired = true;
-  (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(pixelURL, null, JSON.stringify(outputObj), {
+  (0,_src_ajax_js__WEBPACK_IMPORTED_MODULE_5__.ajax)(pixelURL, {
+    success: setCookie,
+    error: null
+  }, JSON.stringify(outputObj), {
     contentType: 'application/json',
     withCredentials: true,
     method: 'POST'
@@ -14642,7 +14668,7 @@ var complianceAdapter = Object.assign({}, baseAdapter, {
           if (!loggerFired) {
             fireComplianceLoggerCall();
           }
-        }, 10000);
+        }, 20000);
         break;
     }
   }
@@ -14667,9 +14693,9 @@ _src_adapterManager_js__WEBPACK_IMPORTED_MODULE_8__["default"].registerAnalytics
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "configurationMap": function() { return /* binding */ configurationMap; },
-/* harmony export */   "validateConsentData": function() { return /* binding */ validateConsentData; }
+/* harmony export */   "configurationMap": function() { return /* binding */ configurationMap; }
 /* harmony export */ });
+/* unused harmony export validateConsentData */
 /* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/esm/slicedToArray.js");
 /* harmony import */ var _src_utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../src/utils.js */ "./src/utils.js");
 
