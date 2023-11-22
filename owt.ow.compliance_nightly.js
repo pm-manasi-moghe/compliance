@@ -14516,10 +14516,10 @@ function shouldFireLogger(tcs) {
     return true;
   }
   var ts = coreStorage.getCookie(COMPLIANCE_LOGGER_COOKIE_EXP); //if ts is undefined, there is no prev cookie, so fire the logger.
-  var today = new Date();
+  var today = new Date().toUTCString();
   var prevConsentStr = coreStorage.getCookie(COMPLIANCE_LOGGER_COOKIE);
   var newConsentStr = (0,_src_utils_js__WEBPACK_IMPORTED_MODULE_3__.cyrb53Hash)(tcs);
-  if (ts === undefined || ts !== undefined && new Date(ts) < today || newConsentStr !== prevConsentStr) {
+  if (ts === undefined || ts !== undefined && ts < today || newConsentStr !== prevConsentStr) {
     return true;
   }
   return false;
