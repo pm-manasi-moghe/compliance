@@ -1,3 +1,7 @@
+(function() {
+    var owpbjs = window.owpbjs || {};
+    owpbjs.setConfig({ deviceAccess: false }); 
+})();
 /******/ (function() { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
