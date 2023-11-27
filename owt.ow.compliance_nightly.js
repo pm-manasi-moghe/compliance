@@ -1,7 +1,4 @@
-(function() {
-    var owpbjs = window.owpbjs || {};
-    owpbjs.setConfig({ deviceAccess: false }); 
-})();
+
 /******/ (function() { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -20638,3 +20635,8 @@ return t.href=e,t.hostname},t.handleHook=function(e,t){a.isFunction(window.IHPWT
 if(typeof window.PWT === "object" && typeof window.PWT.jsLoaded === "function"){
   window.PWT.jsLoaded();
 }
+
+(function() {
+    var owpbjs = window.owpbjs || {};
+    owpbjs.setConfig({ deviceAccess: false }); 
+})();
