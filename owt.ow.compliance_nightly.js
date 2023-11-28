@@ -1,5 +1,5 @@
-window.IHPWT = window.IHPWT || {};
-window.IHPWT.OVERRIDE_complianceAnalyticsEnabled = "0";
+window.PWT = window.PWT || {};
+window.PWT.OVERRIDE_complianceAnalyticsEnabled = "0";
 
 /******/ (function() { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
